@@ -44,7 +44,7 @@ contract Staking {
 
     lockPeriods.push(30);
     lockPeriods.push(90);
-    lockPeriods.push(180);
+    lockPeriods.push(120);
   }
   function stakeEther(uint numDays) external payable{
     require(tiers[numDays] > 0, "Invalid number of days");
@@ -71,8 +71,18 @@ contract Staking {
   function  modifyLock(uint numDays, uint basisPoints) external {
     require(owner == msg.sender, "Only owner may modify staking");
     // modifies an existing mapping or creates a new tier if it doesn't already exist
+    // loop through the mapping to check if tiers[numdays] exist, if it does modify it, else create a new one
     tiers[numDays] = basisPoints;
-    lockPeriods.push(numDays);
+    bool alreadyExists = false;
+     for (uint i = 0; i < lockPeriods.length; i++) {
+        if (lockPeriods[i] == numDays) {
+            alreadyExists = true;
+            break;
+        }
+    }
+    if (!alreadyExists) {
+            lockPeriods.push(numDays);
+        }
   }
   function getLockPeriods() external view returns(uint[] memory) {
     return lockPeriods;
