@@ -151,6 +151,59 @@ describe('getPositionById', () => {
   })
 })
   
+  describe("getPositionIdsForAddress", () => {
+    it("returns a list of positionIds created by a specific address", async () => {
+      let data;
+      let transaction;
+      data = { value: ethers.utils.parseEther('5') }
+      transaction = await staking.connect(signer1).stakeEther(90, data);
+      data = { value: ethers.utils.parseEther("10") }
+      transaction = await staking.connect(signer1).stakeEther(90, data);
+
+      const positionIds = await staking.getPositionIdsForAddress(signer1.address)
+      expect(
+        positionIds.map(p => Number(p))
+      ).to.eql(
+        [0,1]
+      )
+    })
+  })
+
+  describe("changeUnlockDate", function () {
+    describe("owner", function () {
+      it('changes the unlock Date', async () => {
+        const data = { value: ethers.utils.parseEther("8") }
+        transaction = await staking.connect(signer2).stakeEther(90, data)
+        const positionOld = await staking.getPositionById(0)
+        const oldUnlockDate = positionOld.unlockDate
+        console.log(oldUnlockDate - (86400 * 20));
+        const newUnlockDate = positionOld.unlockDate - (86400 * 20)
+        console.log(newUnlockDate);
+        await staking.connect(signer1).changeUnlockDate(0, newUnlockDate)
+        positionNew = await staking.getPositionById(0)
+
+        expect(
+          positionNew.unlockDate
+        ).to.be.equal(
+          oldUnlockDate - (86400 * 20)
+        )
+        
+      })
+    })
+    describe("non-owner", function () {
+      it("reverts", async () => {
+        const data = { value: ethers.utils.parseEther("8") }
+        transaction = await staking.connect(signer2).stakeEther(90, data)
+        const positionOld = await staking.getPositionById(0)
+        const newUnlockDate = positionOld.unlockDate - (86400 * 500)
+        expect(
+          staking.connect(signer2).changeUnlockDate(0, newUnlockDate)).to.be.revertedWith("only owner can call this function")
+        
+      })
+    })
+  })
+
+
   
   
 })

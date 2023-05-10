@@ -98,10 +98,10 @@ contract Staking {
     return positionIdsByAddress[walletAddress];
   }
 
-  function changeUnlockDate(uint positionId, uint newUnlockDate) external view{
+  function changeUnlockDate(uint positionId, uint newUnlockDate) external{
     require(owner == msg.sender, "only owner can call this function");
     // shouldn't you require that the position already exists.. or does it create a new postion if it doesn't
-    positions[positionId].unlockDate == newUnlockDate;
+    positions[positionId].unlockDate = newUnlockDate;
   }
 
 
