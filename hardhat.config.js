@@ -5,6 +5,6 @@ module.exports = {
     version: "0.8.0"
   },
   paths: {
-    artifacts: "./client/scr/artifacts"
+    artifacts: "./client-side/src/artifacts"
   }
 };

@@ -1,8 +1,6 @@
 import React from "react";
 
-import React from 'react'
-
-const NavBar = ({isConnected, connectAndLoad}) => {
+const NavBar = ({isConnected, connect}) => {
   return (
     <>
       <div className="navBar">
@@ -16,7 +14,7 @@ const NavBar = ({isConnected, connectAndLoad}) => {
           isConnected() ? (
             <div className="connectButton">Connected</div>
           ) : (
-              <div className="connectButton" onClick={() => connectAndLoad()}>
+              <div className="connectButton" onClick={() => connect()}>
                 Connect Wallet
               </div>
           )
