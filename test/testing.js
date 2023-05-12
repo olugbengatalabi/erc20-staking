@@ -203,8 +203,55 @@ describe('getPositionById', () => {
     })
   })
 
+  describe("closePosition", () => {
+    describe('after Unlock date', () => {
+      it("transfers principal and interest", async () => {
+        let transaction
+        let block
+        const provider = waffle.provider;
+        const data = { value: ethers.utils.parseEther("8") }
+        transaction = await staking.connect(signer2).stakeEther(90, data)
+        receipt = transaction.wait()
+        block = await provider.getBlock(receipt.blockNumber)
+        const newUnlockDate = block.timestamp - (86400 * 100)
+        await staking.connect(signer1).changeUnlockDate(0, newUnlockDate)
+        const position = await staking.getPositionById(0)
+        const signerBalanceBefore = await signer2.getBalance()
+        transaction = await staking.connect(signer2).closePosition(0)
+        receipt = await transaction.wait()
 
-  
+        const gasUsed = receipt.gasUsed.mul(receipt.effectiveGasPrice)
+        const signerBalanceAfter = await signer2.getBalance()
+        expect(
+          signerBalanceAfter
+        ).to.equal(signerBalanceBefore.sub(gasUsed).add(position.weiStaked).add(position.weiInterest)
+        )
+      })
+     })
+    describe('before Unlock date', () => {
+      it("transfers only principal ", async () => {
+        let transaction
+        let block
+        const provider = waffle.provider;
+        const data = { value: ethers.utils.parseEther("5") }
+        transaction = await staking.connect(signer2).stakeEther(90, data)
+        receipt = transaction.wait()
+        block = await provider.getBlock(receipt.blockNumber)
+
+        const position = await staking.getPositionById(0)
+        const signerBalanceBefore = await signer2.getBalance()
+        transaction = await staking.connect(signer2).closePosition(0)
+        receipt = await transaction.wait()
+
+        const gasUsed = receipt.gasUsed.mul(receipt.effectiveGasPrice)
+        const signerBalanceAfter = await signer2.getBalance()
+        expect(
+          signerBalanceAfter
+        ).to.equal(signerBalanceBefore.sub(gasUsed).add(position.weiStaked)
+        )
+      })
+     })
+  })
   
 })
 // questions 
